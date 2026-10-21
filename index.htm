@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>España Clicker</title>
+  <style>
+    body {
+      background: linear-gradient(135deg, #aa151b 30%, #f1bf00 30%, #f1bf00 70%, #aa151b 70%);
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      width: 92%;
+      max-width: 380px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    h1 { color: #aa151b; font-size: 1.4rem; margin-top: 0; }
+    .stats { font-size: 1.1rem; font-weight: bold; background: #fff3c4; padding: 8px; border-radius: 8px; margin: 8px 0; border: 2px solid #f1bf00; }
+    .click-btn {
+      background-color: #aa151b;
+      color: white;
+      border: 3px solid #f1bf00;
+      font-size: 1.3rem;
+      padding: 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      width: 100%;
+      font-weight: bold;
+      box-shadow: 0 4px 0 #7a0e13;
+    }
+    .click-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #7a0e13;
+    }
+    .shop {
+      margin-top: 12px;
+      text-align: left;
+      border-top: 2px solid #f1bf00;
+      padding-top: 8px;
+    }
+    .shop h3 { margin: 0 0 6px 0; color: #aa151b; font-size: 1rem; text-align: center; }
+    .upgrade-btn {
+      width: 100%;
+      background-color: #2e7d32;
+      color: white;
+      border: none;
+      padding: 8px;
+      margin: 4px 0;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+    .upgrade-btn:disabled {
+      background-color: #9e9e9e;
+      cursor: not-allowed;
+    }
+    .item-info {
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+    }
+    .item-desc {
+      font-size: 0.7rem;
+      color: #e0f2f1;
+      font-weight: normal;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🇪🇸 España Clicker</h1>
+    
+    <div class="stats">
+      Puntos: <span id="score">0</span> 🇪🇸<br>
+      <small style="font-size: 0.8rem; color: #555;">
+        +<span id="cpc">1</span>/clic | +<span id="cps">0</span>/seg
+      </small>
+    </div>
+
+    <button class="click-btn" id="clickBtn">¡CLIC!</button>
+
+    <div class="shop">
+      <h3>🛒 Tienda Tradicional</h3>
+      
+      <button class="upgrade-btn" id="buyAbanico">
+        <span class="item-info">
+          <span>💃 Abanico Flamenco</span>
+          <span class="item-desc">+1 pto por clic</span>
+        </span>
+        <span id="costAbanico">15 pts</span>
+      </button>
+
+      <button class="upgrade-btn" id="buyCastañuelas">
+        <span class="item-info">
+          <span>🎵 Castañuelas</span>
+          <span class="item-desc">+3 ptos por clic</span>
+        </span>
+        <span id="costCastañuelas">100 pts</span>
+      </button>
+
+      <button class="upgrade-btn" id="buyPaella">
+        <span class="item-info">
+          <span>🥘 Paella Valenciana</span>
+          <span class="item-desc">+2 ptos automáticos/seg</span>
+        </span>
+        <span id="costPaella">50 pts</span>
+      </button>
+
+      <button class="upgrade-btn" id="buyTapas">
+        <span class="item-info">
+          <span>🍷 Barra de Tapas</span>
+          <span class="item-desc">+10 ptos automáticos/seg</span>
+        </span>
+        <span id="costTapas">400 pts</span>
+      </button>
+    </div>
+  </div>
+
+  <script>
+    let score = 0;
+    let powerClick = 1;
+    let autoClick = 0;
+    
+    let costAbanico = 15;
+    let costCastañuelas = 100;
+    let costPaella = 50;
+    let costTapas = 400;
+
+    const scoreSpan = document.getElementById('score');
+    const cpcSpan = document.getElementById('cpc');
+    const cpsSpan = document.getElementById('cps');
+    
+    const costAbanicoSpan = document.getElementById('costAbanico');
+    const costCastañuelasSpan = document.getElementById('costCastañuelas');
+    const costPaellaSpan = document.getElementById('costPaella');
+    const costTapasSpan = document.getElementById('costTapas');
+    
+    const btnClick = document.getElementById('clickBtn');
+    const btnAbanico = document.getElementById('buyAbanico');
+    const btnCastañuelas = document.getElementById('buyCastañuelas');
+    const btnPaella = document.getElementById('buyPaella');
+    const btnTapas = document.getElementById('buyTapas');
+
+    function updateUI() {
+      scoreSpan.innerText = score;
+      cpcSpan.innerText = powerClick;
+      cpsSpan.innerText = autoClick;
+      
+      costAbanicoSpan.innerText = costAbanico + " pts";
+      costCastañuelasSpan.innerText = costCastañuelas + " pts";
+      costPaellaSpan.innerText = costPaella + " pts";
+      costTapasSpan.innerText = costTapas + " pts";
+
+      btnAbanico.disabled = score < costAbanico;
+      btnCastañuelas.disabled = score < costCastañuelas;
+      btnPaella.disabled = score < costPaella;
+      btnTapas.disabled = score < costTapas;
+    }
+
+    btnClick.addEventListener('click', () => {
+      score += powerClick;
+      updateUI();
+    });
+
+    // 1. Abanico Flamenco (+1 Clic)
+    btnAbanico.addEventListener('click', () => {
+      if (score >= costAbanico) {
+        score -= costAbanico;
+        powerClick += 1;
+        costAbanico = Math.floor(costAbanico * 1.5);
+        updateUI();
+      }
+    });
+
+    // 2. Castañuelas (+3 Clic)
+    btnCastañuelas.addEventListener('click', () => {
+      if (score >= costCastañuelas) {
+        score -= costCastañuelas;
+        powerClick += 3;
+        costCastañuelas = Math.floor(costCastañuelas * 1.6);
+        updateUI();
+      }
+    });
+
+    // 3. Paella Valenciana (+2 Auto/s)
+    btnPaella.addEventListener('click', () => {
+      if (score >= costPaella) {
+        score -= costPaella;
+        autoClick += 2;
+        costPaella = Math.floor(costPaella * 1.5);
+        updateUI();
+      }
+    });
+
+    // 4. Barra de Tapas (+10 Auto/s)
+    btnTapas.addEventListener('click', () => {
+      if (score >= costTapas) {
+        score -= costTapas;
+        autoClick += 10;
+        costTapas = Math.floor(costTapas * 1.6);
+        updateUI();
+      }
+    });
+
+    // Generador automático cada segundo
+    setInterval(() => {
+      if (autoClick > 0) {
+        score += autoClick;
+        updateUI();
+      }
+    }, 1000);
+
+    updateUI();
+  </script>
+</body>
+</html>
